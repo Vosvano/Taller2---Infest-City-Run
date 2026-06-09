@@ -4,32 +4,39 @@ using UnityEngine;
 
 public class Mov_Camara : MonoBehaviour
 {
+    public Transform target;
 
-     // Velocidad de movimiento
-    public float velocidad = 3f;
-    // CharacterController para mover al jugador
-    private CharacterController characterController;
-    // Gravedad para la caída del jugador
+    public Vector3 offset = new Vector3(0f, 5f, -10f);
+    // velocidad de la camara
+    public float smoothSpeed = 5f;
+
+    [Tooltip("Si está activado, la cámara solo seguirá la X del jugador (mantiene Y/Z fijos)")]
+    public bool followXOnly = true;
+
     void Start()
     {
-        characterController = GetComponent<CharacterController>();
+        if (target == null)
+        {
+            Debug.LogWarning("Mov_Camara: no se ha asignado target (Player). Asigna el Transform del jugador en el inspector.");
+        }
     }
 
-    
-    void Update()
+    void LateUpdate()
     {
+        if (target == null) return;
 
-        characterController.Move(transform.forward * velocidad * Time.deltaTime);
-
-        float hor = Input.GetAxis("Horizontal");
-
-        if (hor < 0)
+        Vector3 desiredPosition;
+        if (followXOnly)
         {
-            characterController.Move(transform.right * hor * 8 * Time.deltaTime);
+            // Seguir únicamente la X del jugador; mantener Y y Z fijos.
+            desiredPosition = new Vector3(target.position.x + offset.x, transform.position.y, transform.position.z);
         }
-        else if (hor > 0)
+        else
         {
-            characterController.Move(transform.right * hor * 8 * Time.deltaTime);
+            desiredPosition = target.position + offset;
         }
+
+        transform.position = Vector3.Lerp(transform.position, desiredPosition, smoothSpeed * Time.deltaTime);
+        if (!followXOnly) transform.LookAt(target);
     }
 }
