@@ -4,16 +4,19 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    public GameObject projectilePrefab;
-    public float projectileOffset = 1f;
 
+        // Bala pre fabricada
+
+    public float velocityProj = 20f;
+    
     private bool isDead = false;
-
+    // Start is called before the first frame update
     void Start()
     {
 
     }
 
+    // Update is called once per frame
     void Update()
     {
 
