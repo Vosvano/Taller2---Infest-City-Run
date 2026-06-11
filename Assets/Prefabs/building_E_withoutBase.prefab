@@ -12,7 +12,6 @@ GameObject:
   - component: {fileID: 1881909106673375254}
   - component: {fileID: 3137881407077492301}
   - component: {fileID: 5571581757979384770}
-  - component: {fileID: 1577348982756116533}
   m_Layer: 0
   m_Name: building_E_withoutBase
   m_TagString: Untagged
@@ -107,27 +106,3 @@ MeshCollider:
   m_Convex: 0
   m_CookingOptions: 30
   m_Mesh: {fileID: 9106111549488924196, guid: cac8456efea3f4340bdcec070dc12cea, type: 3}
---- !u!114 &1577348982756116533
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1741858071302159083}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 9718a04847e97264cb1c10d5d1db59ed, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  buildingPrefabs:
-  - {fileID: 919132149155446097, guid: c7b760af83b57e14b95555a582162e65, type: 3}
-  - {fileID: 919132149155446097, guid: 9bec967dbf0c35446be058168c575198, type: 3}
-  - {fileID: 919132149155446097, guid: 35e37beda493a2641bada23b184647c6, type: 3}
-  - {fileID: 919132149155446097, guid: f2617316faf71a442b08b2ba77b53b5f, type: 3}
-  - {fileID: 919132149155446097, guid: cac8456efea3f4340bdcec070dc12cea, type: 3}
-  - {fileID: 919132149155446097, guid: 4bbe9ce1feef413409b3e556cf129045, type: 3}
-  - {fileID: 919132149155446097, guid: 548e7a017c1cbad49ad99640c59466ca, type: 3}
-  - {fileID: 919132149155446097, guid: ccae3c3f59fc04c4d848c016af5cf07b, type: 3}
-  player: {fileID: 0}
-  spawnDistance: 50
-  despawnDistance: 60

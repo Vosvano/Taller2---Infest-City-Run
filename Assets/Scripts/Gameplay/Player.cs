@@ -12,7 +12,6 @@ public class Player : MonoBehaviour
 
     }
 
-    // Update is called once per frame
     void Update()
     {
 
@@ -73,10 +72,4 @@ public class Player : MonoBehaviour
         UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
     }
 
-    // Called by collectible items when the player picks them up
-    public void AddCoin(int amount)
-    {
-        coins += amount;
-        Debug.Log("Coins: " + coins);
-    }
 }

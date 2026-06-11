@@ -42,8 +42,6 @@ public class ShootProjectile : MonoBehaviour
                         projectileRigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
                         projectileRigidbody.AddForce(offPoint.forward * speed, ForceMode.Impulse);
                     }
-
-                    // Ensure the projectile has a collision handler so it reliably destroys enemies/obstacles
                     if (newProjectile.GetComponent<ProjectileCollision>() == null)
                     {
                         newProjectile.AddComponent<ProjectileCollision>();
