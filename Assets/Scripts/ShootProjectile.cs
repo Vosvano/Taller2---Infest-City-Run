@@ -35,7 +35,19 @@ public class ShootProjectile : MonoBehaviour
                     GameObject newProjectile;
                     newProjectile = Instantiate(projectilePrefab,offPoint.position, offPoint.rotation);
 
-                    newProjectile.GetComponent<Rigidbody>().AddForce(offPoint.forward * speed, ForceMode.Impulse);
+                    Rigidbody projectileRigidbody = newProjectile.GetComponent<Rigidbody>();
+                    if (projectileRigidbody != null)
+                    {
+                        projectileRigidbody.useGravity = false;
+                        projectileRigidbody.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+                        projectileRigidbody.AddForce(offPoint.forward * speed, ForceMode.Impulse);
+                    }
+
+                    // Ensure the projectile has a collision handler so it reliably destroys enemies/obstacles
+                    if (newProjectile.GetComponent<ProjectileCollision>() == null)
+                    {
+                        newProjectile.AddComponent<ProjectileCollision>();
+                    }
 
                     shotRateTimer = Time.time + shotRate;
 
@@ -49,10 +61,53 @@ public class ShootProjectile : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Enemy") || other.CompareTag("Obstacle"))
+        if (IsDestroyableTarget(other))
         {
-            Destroy(other.gameObject);
+            Destroy(GetTargetRoot(other));
             Destroy(gameObject);
         }
+    }
+
+    void OnCollisionEnter(Collision collision)
+    {
+        if (IsDestroyableTarget(collision.collider))
+        {
+            Destroy(GetTargetRoot(collision.collider));
+            Destroy(gameObject);
+        }
+    }
+
+    private bool IsDestroyableTarget(Collider other)
+    {
+        if (other == null) return false;
+
+        if (other.CompareTag("Enemy") || other.CompareTag("Obstacle"))
+        {
+            return true;
+        }
+
+        if (other.GetComponentInParent<Enemy>() != null || other.GetComponentInParent<Obstacle>() != null)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    private GameObject GetTargetRoot(Collider other)
+    {
+        if (other == null) return null;
+
+        if (other.GetComponentInParent<Enemy>() != null)
+        {
+            return other.GetComponentInParent<Enemy>().gameObject;
+        }
+
+        if (other.GetComponentInParent<Obstacle>() != null)
+        {
+            return other.GetComponentInParent<Obstacle>().gameObject;
+        }
+
+        return other.gameObject;
     }
 }

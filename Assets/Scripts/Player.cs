@@ -4,13 +4,9 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-
-        // Bala pre fabricada
-
-    public float velocityProj = 20f;
     
+    public int coins = 0;
     private bool isDead = false;
-    // Start is called before the first frame update
     void Start()
     {
 
@@ -43,7 +39,7 @@ public class Player : MonoBehaviour
 
         if (obj == null) return;
 
-        if (obj.CompareTag("Enemy") || obj.CompareTag("Obstacle"))
+        if (IsDeathCollision(obj))
         {
             Debug.Log("Player collided with: " + obj.name);
             isDead = true;
@@ -51,8 +47,36 @@ public class Player : MonoBehaviour
         }
     }
 
+    private bool IsDeathCollision(GameObject obj)
+    {
+        if (obj.CompareTag("Enemy") || obj.CompareTag("Obstacle"))
+        {
+            return true;
+        }
+
+        Transform root = obj.transform.root;
+        if (root != null && (root.CompareTag("Enemy") || root.CompareTag("Obstacle")))
+        {
+            return true;
+        }
+
+        if (obj.GetComponentInParent<Enemy>() != null || obj.GetComponentInParent<Obstacle>() != null)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
     private void RestartLevel()
     {
         UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
+    }
+
+    // Called by collectible items when the player picks them up
+    public void AddCoin(int amount)
+    {
+        coins += amount;
+        Debug.Log("Coins: " + coins);
     }
 }

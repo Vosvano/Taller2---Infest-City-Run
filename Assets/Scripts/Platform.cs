@@ -13,6 +13,10 @@ public class Platform : MonoBehaviour
     [Range(0f, 1f)]
     public float spawnChance = 0.8f; // probabilidad de que aparezca algún item
 
+    [Header("Quantity Limits")]
+    public int minItemsPerPlatform = 1;
+    public int maxItemsPerPlatform = 3;
+
     // para evitar repetición monotona entre plataformas
     private static int lastSpawnedItemIndex = -1;
 
@@ -22,6 +26,8 @@ public class Platform : MonoBehaviour
 
     public void SpawnItemOnPlatform(bool canSpawnObstacles)
     {
+        if (!canSpawnObstacles) return;
+
         if (possibleItems == null || possibleItems.Length == 0) return;
         if (itemPositions == null || itemPositions.Length == 0) return;
 
@@ -30,41 +36,77 @@ public class Platform : MonoBehaviour
         int[] allowedIndices = GetAllowedItemIndices(canSpawnObstacles);
         if (allowedIndices == null || allowedIndices.Length == 0) return;
 
-        int itemIndex = PickWeightedItemIndex(allowedIndices);
-        int posIndex = Random.Range(0, itemPositions.Length);
+        int targetAmount = Random.Range(minItemsPerPlatform, maxItemsPerPlatform + 1);
+        targetAmount = Mathf.Min(targetAmount, itemPositions.Length);
 
-        if (possibleItems[itemIndex] == null || itemPositions[posIndex] == null) return;
-
-        // si el ultimo spawn fue del mismo tipo, reintentar para variar (hasta 5 intentos)
-        int attempts = 0;
-        while (attempts < 5 && itemIndex == lastSpawnedItemIndex && allowedIndices.Length > 1)
+        List<int> availablePosIndices = new List<int>();
+        for (int i = 0; i < itemPositions.Length; i++)
         {
-            itemIndex = PickWeightedItemIndex(allowedIndices);
-            attempts++;
+            if (itemPositions[i] != null && itemPositions[i].childCount == 0)
+            {
+                availablePosIndices.Add(i);
+            }
         }
 
-        // calcular posición de spawn usando la posición local del punto
-        Vector3 spawnPos = transform.TransformPoint(itemPositions[posIndex].localPosition);
-
-        // evitar solapamientos si el punto ya tiene un hijo
-        if (itemPositions[posIndex].childCount > 0) return;
-
-        // usar la rotación del prefab como base para que las rotaciones aplicadas en el prefab se respeten
-        Quaternion prefabWorldRot = possibleItems[itemIndex].transform.rotation;
-        GameObject inst = Instantiate(possibleItems[itemIndex], spawnPos, prefabWorldRot, itemPositions[posIndex]);
-
-        // aplicar la rotación base del prefab + una variación en Y para evitar que queden idénticos
-        Vector3 baseLocalEuler = possibleItems[itemIndex].transform.localEulerAngles;
-        inst.transform.localRotation = Quaternion.Euler(baseLocalEuler + new Vector3(0f, Random.Range(-20f, 20f), 0f));
-        inst.transform.localPosition = new Vector3(0f, inst.transform.localPosition.y, 0f);
-
-        // si es un enemigo, lo desemparentamos para que se mueva independientemente
-        if (inst.GetComponent<Enemy>() != null)
+        for (int i = 0; i < targetAmount; i++)
         {
-            inst.transform.parent = null;
-        }
+            if (availablePosIndices.Count == 0) break;
 
-        lastSpawnedItemIndex = itemIndex;
+            int itemIndex = PickWeightedItemIndex(allowedIndices);
+
+            // si el ultimo spawn fue del mismo tipo, reintentar para variar (hasta 5 intentos)
+            int attempts = 0;
+            while (attempts < 5 && itemIndex == lastSpawnedItemIndex && allowedIndices.Length > 1)
+            {
+                itemIndex = PickWeightedItemIndex(allowedIndices);
+                attempts++;
+            }
+
+            int randomListIndex = Random.Range(0, availablePosIndices.Count);
+            int posIndex = availablePosIndices[randomListIndex];
+            availablePosIndices.RemoveAt(randomListIndex);
+
+            if (possibleItems[itemIndex] == null || itemPositions[posIndex] == null) continue;
+
+            // calcular posición de spawn usando la posición local del punto
+            Vector3 spawnPos = transform.TransformPoint(itemPositions[posIndex].localPosition);
+
+            // instanciar y parentear al punto para que siga a la plataforma (obstáculos)
+            GameObject inst = Instantiate(possibleItems[itemIndex], spawnPos, Quaternion.identity, itemPositions[posIndex]);
+
+            Coin coinComponent = inst.GetComponent<Coin>();
+            bool isEnemy = inst.GetComponent<Enemy>() != null;
+            bool isObstacle = !isEnemy && coinComponent == null;
+
+            if (isObstacle)
+            {
+                // variar rotación ligeramente para que no sean idénticos
+                inst.transform.rotation = Quaternion.Euler(-90f, Random.Range(-20f, 20f), 0f);
+            }
+            else
+            {
+                // variar rotación ligeramente para que no sean idénticos
+                inst.transform.rotation = Quaternion.Euler(0f, Random.Range(-20f, 20f), 0f);
+            }
+
+            inst.transform.localPosition = new Vector3(0f, inst.transform.localPosition.y, 0f);
+
+            float alturaFinal = 0f;
+            if (isEnemy) alturaFinal = 0.2f;
+            else if (isObstacle) alturaFinal = 0.1f;
+            else if (coinComponent != null) alturaFinal = coinComponent.verticalOffset;
+
+            Vector3 posicionGlobalActual = inst.transform.position;
+            inst.transform.position = new Vector3(posicionGlobalActual.x, spawnPos.y + alturaFinal, posicionGlobalActual.z);
+
+            // si es un enemigo, lo desemparentamos para que se mueva independientemente
+            if (isEnemy)
+            {
+                inst.transform.parent = null;
+            }
+
+            lastSpawnedItemIndex = itemIndex;
+        }
     }
 
     private int[] GetAllowedItemIndices(bool canSpawnObstacles)
