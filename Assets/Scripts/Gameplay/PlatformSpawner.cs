@@ -87,6 +87,7 @@ public class PlatformSpawner : MonoBehaviour
             bool canSpawnObstacles = spawnedPlatformCount > initialPlatforms;
             platform.SpawnItemOnPlatform(canSpawnObstacles);
         }
+        
         activePlatforms.Add(plat);
         nextSpawn += platformLength;
     }

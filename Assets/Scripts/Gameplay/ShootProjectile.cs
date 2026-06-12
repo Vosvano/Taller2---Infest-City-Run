@@ -89,6 +89,11 @@ public class ShootProjectile : MonoBehaviour
             return true;
         }
 
+        if (other.CompareTag("Vehicle") || other.GetComponentInParent<Vehicle>() != null)
+        {
+            return false;
+        }
+
         return false;
     }
 
@@ -104,6 +109,11 @@ public class ShootProjectile : MonoBehaviour
         if (other.GetComponentInParent<Obstacle>() != null)
         {
             return other.GetComponentInParent<Obstacle>().gameObject;
+        }
+
+        if (other.GetComponentInParent<Vehicle>() != null)
+        {
+            return other.GetComponentInParent<Vehicle>().gameObject;
         }
 
         return other.gameObject;

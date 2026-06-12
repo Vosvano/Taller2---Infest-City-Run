@@ -6,7 +6,7 @@ public class Platform : MonoBehaviour
 {
     [Header("Item spawn settings")]
     public Transform[] itemPositions; // 3 posibles posiciones
-    public GameObject[] possibleItems; // moneda, enemigo, obstáculo
+    public GameObject[] possibleItems; // moneda, enemigo, obstáculo y vehiculos
     [Tooltip("Pesos opcionales para cada tipo en possibleItems. Si vacío se usa probabilidad uniforme.")]
     public float[] spawnWeights;
 
@@ -77,6 +77,7 @@ public class Platform : MonoBehaviour
             Coin coinComponent = inst.GetComponent<Coin>();
             bool isEnemy = inst.GetComponent<Enemy>() != null;
             bool isObstacle = !isEnemy && coinComponent == null;
+            bool isVehicle = inst.GetComponent<Vehicle>() != null;
 
             if (isObstacle)
             {
@@ -93,6 +94,7 @@ public class Platform : MonoBehaviour
 
             float alturaFinal = 0f;
             if (isEnemy) alturaFinal = 0.2f;
+            else if (isVehicle) alturaFinal = 0f;
             else if (isObstacle) alturaFinal = 0.1f;
             else if (coinComponent != null) alturaFinal = coinComponent.verticalOffset;
 
@@ -103,6 +105,18 @@ public class Platform : MonoBehaviour
             if (isEnemy)
             {
                 inst.transform.parent = null;
+            }
+
+            if (isVehicle)
+            {
+                inst.transform.parent = null;
+                // variar rotación ligeramente para que no sean idénticos
+                inst.transform.rotation = Quaternion.Euler(-90f, 0f, 0f);
+            }
+            else
+            {
+                // variar rotación ligeramente para que no sean idénticos
+                inst.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
             }
 
             lastSpawnedItemIndex = itemIndex;
