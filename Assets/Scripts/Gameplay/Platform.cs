@@ -5,13 +5,13 @@ using UnityEngine;
 public class Platform : MonoBehaviour
 {
     [Header("Item spawn settings")]
-    public Transform[] itemPositions;
-    public GameObject[] possibleItems;
+    public Transform[] itemPositions; // 3 posible posiciones
+    public GameObject[] possibleItems;// moneda enemigo obstaculo vehiculo
     [Tooltip("Pesos opcionales para cada tipo en possibleItems. Si vacío se usa probabilidad uniforme.")]
     public float[] spawnWeights;
 
     [Range(0f, 1f)]
-    public float spawnChance = 0.8f;
+    public float spawnChance = 0.8f; //probabilidad de que se intente spawnear algo en esta plataforma
 
     [Header("Quantity Limits")]
     public int minItemsPerPlatform = 1;
@@ -53,6 +53,7 @@ public class Platform : MonoBehaviour
 
             int itemIndex = PickWeightedItemIndex(allowedIndices);
 
+            // si el ultimo fue el mismo tipo intentamos 5 veces
             int attempts = 0;
             while (attempts < 5 && itemIndex == lastSpawnedItemIndex && allowedIndices.Length > 1)
             {
@@ -68,7 +69,7 @@ public class Platform : MonoBehaviour
 
             Vector3 spawnPos = transform.TransformPoint(itemPositions[posIndex].localPosition);
 
-            // Nacimiento con la rotación del punto de spawn
+      
             GameObject inst = Instantiate(possibleItems[itemIndex], spawnPos, itemPositions[posIndex].rotation, itemPositions[posIndex]);
 
             Coin coinComponent = inst.GetComponent<Coin>();
@@ -93,10 +94,10 @@ public class Platform : MonoBehaviour
             }
             else if (isVehicle)
             {
-                // Dejarlo como hijo y forzar que sus ángulos locales se reseteen por completo a los del punto de spawn
+               
                 inst.transform.localEulerAngles = Vector3.zero;
 
-                // Si el modelo visual está dentro de un hijo, reseteamos su rotación local también
+              
                 if (inst.transform.childCount > 0)
                 {
                     inst.transform.GetChild(0).localEulerAngles = Vector3.zero;
