@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class Obstacle : MonoBehaviour
 {
@@ -11,12 +12,6 @@ public class Obstacle : MonoBehaviour
             Destroy(other.gameObject);
             Destroy(gameObject);
             return;
-        }
-
-        if (other.CompareTag("Player"))
-        {
-            Debug.Log("Obstacle triggered by Player: " + name);
-            UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
         }
     }
 }

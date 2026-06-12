@@ -1,12 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 
 public class Player : MonoBehaviour
 {
     
     public int coins = 0;
     private bool isDead = false;
+    public event Action OnPlayerDeath;
     void Start()
     {
 
@@ -42,7 +44,8 @@ public class Player : MonoBehaviour
         {
             Debug.Log("Player collided with: " + obj.name);
             isDead = true;
-            RestartLevel();
+            GameManager.Instance.StopScoreIncrease();
+            OnPlayerDeath?.Invoke();
         }
     }
 
@@ -65,11 +68,6 @@ public class Player : MonoBehaviour
         }
 
         return false;
-    }
-
-    private void RestartLevel()
-    {
-        UnityEngine.SceneManagement.SceneManager.LoadScene(UnityEngine.SceneManagement.SceneManager.GetActiveScene().name);
     }
 
 }

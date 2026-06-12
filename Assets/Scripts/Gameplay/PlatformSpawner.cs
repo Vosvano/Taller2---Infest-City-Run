@@ -6,7 +6,7 @@ public class PlatformSpawner : MonoBehaviour
 {
     [Header("Platform Settings")]
     public GameObject platformPrefab;
-    public int initialPlatforms = 10;
+    public int initialPlatforms = 12;
     public float platformLength = 10f;
 
     [Header("References")]
