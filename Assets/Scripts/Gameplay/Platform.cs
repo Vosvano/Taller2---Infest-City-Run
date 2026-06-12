@@ -5,19 +5,18 @@ using UnityEngine;
 public class Platform : MonoBehaviour
 {
     [Header("Item spawn settings")]
-    public Transform[] itemPositions; // 3 posibles posiciones
-    public GameObject[] possibleItems; // moneda, enemigo, obstáculo y vehiculos
+    public Transform[] itemPositions;
+    public GameObject[] possibleItems;
     [Tooltip("Pesos opcionales para cada tipo en possibleItems. Si vacío se usa probabilidad uniforme.")]
     public float[] spawnWeights;
 
     [Range(0f, 1f)]
-    public float spawnChance = 0.8f; // probabilidad de que aparezca algún item
+    public float spawnChance = 0.8f;
 
     [Header("Quantity Limits")]
     public int minItemsPerPlatform = 1;
     public int maxItemsPerPlatform = 3;
 
-    // para evitar repetición monotona entre plataformas
     private static int lastSpawnedItemIndex = -1;
 
     void Start()
@@ -31,7 +30,7 @@ public class Platform : MonoBehaviour
         if (possibleItems == null || possibleItems.Length == 0) return;
         if (itemPositions == null || itemPositions.Length == 0) return;
 
-        if (Random.value > spawnChance) return; // no spawnear nada
+        if (Random.value > spawnChance) return;
 
         int[] allowedIndices = GetAllowedItemIndices(canSpawnObstacles);
         if (allowedIndices == null || allowedIndices.Length == 0) return;
@@ -54,7 +53,6 @@ public class Platform : MonoBehaviour
 
             int itemIndex = PickWeightedItemIndex(allowedIndices);
 
-            // si el ultimo spawn fue del mismo tipo, reintentar para variar (hasta 5 intentos)
             int attempts = 0;
             while (attempts < 5 && itemIndex == lastSpawnedItemIndex && allowedIndices.Length > 1)
             {
@@ -68,27 +66,15 @@ public class Platform : MonoBehaviour
 
             if (possibleItems[itemIndex] == null || itemPositions[posIndex] == null) continue;
 
-            // calcular posición de spawn usando la posición local del punto
             Vector3 spawnPos = transform.TransformPoint(itemPositions[posIndex].localPosition);
 
-            // instanciar y parentear al punto para que siga a la plataforma (obstáculos)
-            GameObject inst = Instantiate(possibleItems[itemIndex], spawnPos, Quaternion.identity, itemPositions[posIndex]);
+            // Nacimiento con la rotación del punto de spawn
+            GameObject inst = Instantiate(possibleItems[itemIndex], spawnPos, itemPositions[posIndex].rotation, itemPositions[posIndex]);
 
             Coin coinComponent = inst.GetComponent<Coin>();
             bool isEnemy = inst.GetComponent<Enemy>() != null;
             bool isObstacle = !isEnemy && coinComponent == null;
             bool isVehicle = inst.GetComponent<Vehicle>() != null;
-
-            if (isObstacle)
-            {
-                // variar rotación ligeramente para que no sean idénticos
-                inst.transform.rotation = Quaternion.Euler(-90f, Random.Range(-20f, 20f), 0f);
-            }
-            else
-            {
-                // variar rotación ligeramente para que no sean idénticos
-                inst.transform.rotation = Quaternion.Euler(0f, Random.Range(-20f, 20f), 0f);
-            }
 
             inst.transform.localPosition = new Vector3(0f, inst.transform.localPosition.y, 0f);
 
@@ -101,22 +87,29 @@ public class Platform : MonoBehaviour
             Vector3 posicionGlobalActual = inst.transform.position;
             inst.transform.position = new Vector3(posicionGlobalActual.x, spawnPos.y + alturaFinal, posicionGlobalActual.z);
 
-            // si es un enemigo, lo desemparentamos para que se mueva independientemente
-            if (isEnemy)
+            if (isObstacle)
             {
-                inst.transform.parent = null;
+                inst.transform.rotation = Quaternion.Euler(-90f, Random.Range(-20f, 20f), 0f);
             }
-
-            if (isVehicle)
+            else if (isVehicle)
             {
-                inst.transform.parent = null;
-                // variar rotación ligeramente para que no sean idénticos
-                inst.transform.rotation = Quaternion.Euler(-90f, 0f, 0f);
+                // Dejarlo como hijo y forzar que sus ángulos locales se reseteen por completo a los del punto de spawn
+                inst.transform.localEulerAngles = Vector3.zero;
+
+                // Si el modelo visual está dentro de un hijo, reseteamos su rotación local también
+                if (inst.transform.childCount > 0)
+                {
+                    inst.transform.GetChild(0).localEulerAngles = Vector3.zero;
+                }
             }
             else
             {
-                // variar rotación ligeramente para que no sean idénticos
-                inst.transform.rotation = Quaternion.Euler(0f, 0f, 0f);
+                inst.transform.rotation = Quaternion.Euler(0f, Random.Range(-20f, 20f), 0f);
+            }
+
+            if (isEnemy)
+            {
+                inst.transform.parent = null;
             }
 
             lastSpawnedItemIndex = itemIndex;
@@ -145,7 +138,6 @@ public class Platform : MonoBehaviour
     {
         if (allowedIndices == null || allowedIndices.Length == 0) return -1;
 
-        // Si no hay pesos válidos, elegir uniforme
         if (spawnWeights == null || spawnWeights.Length != possibleItems.Length)
         {
             return allowedIndices[Random.Range(0, allowedIndices.Length)];

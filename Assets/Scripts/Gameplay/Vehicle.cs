@@ -4,15 +4,15 @@ using UnityEngine;
 
 public class Vehicle : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    void Awake()
     {
-        
+     
+        transform.rotation = Quaternion.Euler(0f, -90f, 0f);
     }
 
-    // Update is called once per frame
-    void Update()
+    void Start()
     {
-        
+    
+        transform.eulerAngles = new Vector3(0f, -90f, 0f);
     }
 }

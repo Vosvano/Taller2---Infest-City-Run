@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 2117966880503373799}
   - component: {fileID: 1000329779090851039}
   - component: {fileID: 7895953840662361948}
+  - component: {fileID: 6998953515514243390}
   m_Layer: 0
   m_Name: car_sedan
   m_TagString: Vehicle
@@ -27,7 +28,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3336653701275074165}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 121.12459, y: 0.03, z: 2.3929706}
   m_LocalScale: {x: 4, y: 4, z: 4}
   m_ConstrainProportionsScale: 0
@@ -106,6 +107,18 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
+--- !u!114 &6998953515514243390
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3336653701275074165}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8128ad0624831f94eadb6ad3894e7240, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &8753219202822381553
 GameObject:
   m_ObjectHideFlags: 0
