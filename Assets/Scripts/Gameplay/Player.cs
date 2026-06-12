@@ -46,6 +46,7 @@ public class Player : MonoBehaviour
             isDead = true;
             GameManager.Instance.StopScoreIncrease();
             OnPlayerDeath?.Invoke();
+            
         }
     }
 

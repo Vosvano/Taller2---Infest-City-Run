@@ -60,6 +60,10 @@ public class Enemy : MonoBehaviour
     {
         if (IsProjectile(other))
         {
+            // Primero reproducimos el sonido del golpe
+            AudioManager.Instance.PlayEnemyHit();
+
+            // Luego destruimos los objetos físicos
             Destroy(GetProjectileRoot(other));
             Destroy(gameObject);
             return;
@@ -74,6 +78,10 @@ public class Enemy : MonoBehaviour
     {
         if (IsProjectile(collision.collider))
         {
+            // Primero reproducimos el sonido del golpe
+            AudioManager.Instance.PlayEnemyHit();
+
+            // Luego destruimos los objetos físicos
             Destroy(GetProjectileRoot(collision.collider));
             Destroy(gameObject);
             return;

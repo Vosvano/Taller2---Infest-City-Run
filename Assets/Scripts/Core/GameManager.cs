@@ -29,11 +29,13 @@ public class GameManager : MonoBehaviour
         GameOverCanvasGroup.interactable = false;
         GameOverCanvasGroup.alpha = 0f;
         StartCoroutine(IncreaseScoreOverTime());
+        AudioManager.Instance.PlayBackgroundMusic();
     }
 
     public void AddCoins(int amount)
     {
         coinCount += amount;
+        AudioManager.Instance.PlayCoinCollect();
         UIManager.Instance.UpdateCoinCount(coinCount);
     }
     private IEnumerator IncreaseScoreOverTime()
@@ -50,6 +52,8 @@ public class GameManager : MonoBehaviour
     {
         // Detener la corrutina de aumento de puntaje
         StopCoroutine(IncreaseScoreOverTime());
+        AudioManager.Instance.StopBackgroundMusic();
+        AudioManager.Instance.PlayGameOver();
         yield break;
     }
 
